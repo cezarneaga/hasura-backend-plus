@@ -430,7 +430,7 @@ router.post('/refetch-token', async (req, res, next) => {
     delete_a2_jwt_tokens (
       where: {
         _and: [{
-          id: { _eq: $old_a2_jwt_tokens }
+          refetch_token: { _eq: $old_a2_jwt_tokens }
         }, {
           userId: { _eq: $userId }
         }]
