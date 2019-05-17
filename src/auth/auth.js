@@ -255,7 +255,7 @@ router.post('/login', async (req, res, next) => {
   query (
     $email: String!
   ) {
-    a2_users (
+    users (
       where: {
         email: { _eq: $email}
       }
@@ -263,8 +263,8 @@ router.post('/login', async (req, res, next) => {
       id
       password
       active
-      roles: a2_users_roles {
-        a2_role{
+      roles {
+        role{
           slug
         }
       }
@@ -289,8 +289,11 @@ router.post('/login', async (req, res, next) => {
   }
 
   // check if we got any user back
-  const user = hasura_data[`a2_users`][0]
-
+  const userRaw = hasura_data[`a2_users`][0]
+  const user = {
+    ...userRaw,
+    roles: roles.map(r => r.slug),
+  }
   if (!user.active) {
     // console.error('User not activated');
     return next(Boom.unauthorized('User not activated.'))
@@ -369,7 +372,7 @@ router.post('/refetch-token', async (req, res, next) => {
   let query = `
   query get_refetch_token(
     $refetch_token: uuid!,
-    $userId: Int!
+    $userId: uuid!
     $current_timestampz: timestamptz!,
   ) {
   a2_jwt_tokens (
@@ -379,17 +382,17 @@ router.post('/refetch-token', async (req, res, next) => {
         }, {
           userId: { _eq: $userId }
         }, {
-          a2_user: { active: { _eq: true }}
+          user: { active: { _eq: true }}
         }, {
           expiresAt: { _gte: $current_timestampz }
         }]
       }
     ) {
-      a2_user {
+      user {
         id
         active
-        roles: a2_users_roles {
-          a2_role{
+        roles {
+          role{
             slug
           }
         }
@@ -425,7 +428,7 @@ router.post('/refetch-token', async (req, res, next) => {
   mutation (
     $old_a2_jwt_tokens: uuid!,
     $new_refetch_token_data: a2_jwt_tokens_insert_input!
-    $userId: Int!
+    $userId: uuid!
   ) {
     delete_a2_jwt_tokens (
       where: {
