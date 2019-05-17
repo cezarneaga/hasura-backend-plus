@@ -325,7 +325,6 @@ router.post('/login', async (req, res, next) => {
     await graphql_client.request(query, {
       refetch_token_data: {
         userId: user.id,
-        rememberMe: user.rememberMe,
         refetch_token: refetch_token,
         expiresAt: new Date(
           new Date().getTime() + REFETCH_TOKEN_EXPIRES * 60 * 1000
@@ -348,7 +347,6 @@ router.post('/login', async (req, res, next) => {
   res.json({
     jwt_token,
     refetch_token,
-    rememberMe,
     userId: user.id,
   })
 })
