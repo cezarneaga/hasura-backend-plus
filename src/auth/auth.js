@@ -327,7 +327,7 @@ router.post('/login', async (req, res, next) => {
         userId: user.id,
         rememberMe: user.rememberMe,
         // refetch_token: refetch_token,
-        expires_at: new Date(
+        expiresAt: new Date(
           new Date().getTime() + REFETCH_TOKEN_EXPIRES * 60 * 1000
         ), // convert from minutes to milli seconds
       },
@@ -455,7 +455,7 @@ router.post('/refetch-token', async (req, res, next) => {
       new_refetch_token_data: {
         userId: userId,
         id: new_refetch_token,
-        expires_at: new Date(
+        expiresAt: new Date(
           new Date().getTime() + REFETCH_TOKEN_EXPIRES * 60 * 1000
         ), // convert from minutes to milli seconds
       },
