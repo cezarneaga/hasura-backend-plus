@@ -7,7 +7,7 @@ exports.USER_REGISTRATION_AUTO_ACTIVE = process.env
   : false
 exports.HASURA_GRAPHQL_ENDPOINT =
   process.env.HASURA_GRAPHQL_ENDPOINT ||
-  'https://graph.startarium.ro/v1/graphql'
+  'https://hasura.your-app.com/v1alpha1/graphql'
 exports.HASURA_GRAPHQL_ADMIN_SECRET =
   process.env.HASURA_GRAPHQL_ADMIN_SECRET || 'hasura-admin-secret'
 exports.HASURA_GRAPHQL_JWT_SECRET = process.env.HASURA_GRAPHQL_JWT_SECRET
