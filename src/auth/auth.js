@@ -290,9 +290,11 @@ router.post('/login', async (req, res, next) => {
 
   // check if we got any user back
   const userRaw = hasura_data[`a2_users`][0]
+  console.log('TCL: userRaw', userRaw.roles)
+  const roles = userRaw.roles.map(r => r.role.slug)
   const user = {
     ...userRaw,
-    roles: roles.map(r => r.slug),
+    roles,
   }
   if (!user.active) {
     // console.error('User not activated');
