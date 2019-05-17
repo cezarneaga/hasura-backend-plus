@@ -3,7 +3,7 @@ const { JWT_TOKEN_EXPIRES, HASURA_GRAPHQL_JWT_SECRET } = require('../config')
 
 module.exports = {
   generateJwtToken: function(user) {
-    const user_roles = user.roles.map(role => role.slug)
+    const user_roles = user.roles
 
     if (!user_roles.includes('user')) {
       user_roles.push('user')

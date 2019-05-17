@@ -290,7 +290,6 @@ router.post('/login', async (req, res, next) => {
 
   // check if we got any user back
   const userRaw = hasura_data[`a2_users`][0]
-  console.log('TCL: userRaw', userRaw.roles)
   const roles = userRaw.roles.map(r => r.role.slug)
   const user = {
     ...userRaw,
@@ -359,8 +358,8 @@ router.post('/login', async (req, res, next) => {
 router.post('/refetch-token', async (req, res, next) => {
   // validate username and password
   const schema = Joi.object().keys({
-    userId: Joi.required(),
     refetch_token: Joi.string().required(),
+    userId: Joi.required(),
   })
 
   const { error, value } = schema.validate(req.body)
@@ -375,7 +374,7 @@ router.post('/refetch-token', async (req, res, next) => {
   query get_refetch_token(
     $refetch_token: uuid!,
     $userId: uuid!
-    $current_timestampz: timestamptz!,
+    $current_timestampz: timestamp!,
   ) {
   a2_jwt_tokens (
       where: {
