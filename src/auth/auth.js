@@ -326,7 +326,7 @@ router.post('/login', async (req, res, next) => {
       refetch_token_data: {
         userId: user.id,
         rememberMe: user.rememberMe,
-        // refetch_token: refetch_token,
+        refetch_token: refetch_token,
         expiresAt: new Date(
           new Date().getTime() + REFETCH_TOKEN_EXPIRES * 60 * 1000
         ), // convert from minutes to milli seconds
@@ -347,7 +347,7 @@ router.post('/login', async (req, res, next) => {
   // return jwt token and refetch token to client
   res.json({
     jwt_token,
-    id,
+    refetch_token,
     rememberMe,
     userId: user.id,
   })
@@ -357,7 +357,7 @@ router.post('/refetch-token', async (req, res, next) => {
   // validate username and password
   const schema = Joi.object().keys({
     userId: Joi.required(),
-    id: Joi.string().required(),
+    refetch_token: Joi.string().required(),
   })
 
   const { error, value } = schema.validate(req.body)
@@ -366,28 +366,28 @@ router.post('/refetch-token', async (req, res, next) => {
     return next(Boom.badRequest(error.details[0].message))
   }
 
-  const { id, user_id } = value
+  const { refetch_token, userId } = value
 
   let query = `
   query get_refetch_token(
-    $id: uuid!,
+    $refetch_token: uuid!,
     $userId: Int!
     $current_timestampz: timestamptz!,
   ) {
   a2_jwt_tokens (
       where: {
         _and: [{
-          id: { _eq: $id }
+          refetch_token: { _eq: $refetch_token }
         }, {
           userId: { _eq: $userId }
         }, {
-          user: { active: { _eq: true }}
+          a2_user: { active: { _eq: true }}
         }, {
           expiresAt: { _gte: $current_timestampz }
         }]
       }
     ) {
-      user {
+      a2_user {
         id
         active
         roles: a2_users_roles {
@@ -403,7 +403,7 @@ router.post('/refetch-token', async (req, res, next) => {
   let hasura_data
   try {
     hasura_data = await graphql_client.request(query, {
-      id,
+      refetch_token,
       userId,
       current_timestampz: new Date(),
     })
@@ -440,7 +440,7 @@ router.post('/refetch-token', async (req, res, next) => {
     ) {
       affected_rows
     }
-    insert_old_a2_jwt_tokens (
+    insert_a2_jwt_tokens (
       objects: [$new_refetch_token_data]
     ) {
       affected_rows
@@ -454,7 +454,7 @@ router.post('/refetch-token', async (req, res, next) => {
       old_a2_jwt_tokens: refetch_token,
       new_refetch_token_data: {
         userId: userId,
-        id: new_refetch_token,
+        refetch_token: new_refetch_token,
         expiresAt: new Date(
           new Date().getTime() + REFETCH_TOKEN_EXPIRES * 60 * 1000
         ), // convert from minutes to milli seconds
@@ -477,7 +477,7 @@ router.post('/refetch-token', async (req, res, next) => {
 
   res.json({
     jwt_token,
-    id: new_refetch_token,
+    refetch_token: new_refetch_token,
     userId,
   })
 })
