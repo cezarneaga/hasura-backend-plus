@@ -255,7 +255,7 @@ router.post('/login', async (req, res, next) => {
   query (
     $email: String!
   ) {
-    users (
+    a2_users (
       where: {
         email: { _eq: $email}
       }
